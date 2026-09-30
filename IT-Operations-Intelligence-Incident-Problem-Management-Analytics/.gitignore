@@ -1,0 +1,5 @@
+data/*.csv
+!data/sample_rows.csv
+python/output/
+__pycache__/
+*.pyc
