@@ -57,7 +57,7 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 
 ## Repository structure
 
-```
+````
 .
 ├── README.md
 ├── 01_Executive_Brief.pdf              3 pages: cover + decision-ready summary
@@ -88,7 +88,7 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 └── data/
     ├── README.md                       Source, download and load instructions
     └── sample_rows.csv                Fabricated illustrative rows (real schema, not real data)
-```
+````
 
 ## Process
 
@@ -103,11 +103,11 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 3. Reconcile: `SELECT COUNT(*) FROM incidents_final_v2;` must equal the distinct incident count, 20,769.
 4. Validate recurrence independently:
 
-```bash
+````bash
 pip install -r python/requirements.txt
 python python/recurrence_validation.py --input data/incident_event_log.csv \
        --windows 7 14 30 --expect-14d-pairs 73359 --final-row-mode parsed
-```
+````
 
    `--final-row-mode parsed` mirrors SQL v2 (the published figures, `incidents_final_v2`); it reconciles to 73,359 pairs at 14 days, with 5,238 incidents flagged (25.2%). `text` mode mirrors the original v1 rule and reconciles to 73,339 / 5,228 (25.2%) — kept only for comparison, not for quoting.
 
@@ -115,9 +115,9 @@ python python/recurrence_validation.py --input data/incident_event_log.csv \
 
 ## Data quality, resolved
 
-**DQ-08 was open, now closed.** The original final-row rule (`incidents_final`, "v1") ordered `sys_updated_at` as text, so it sometimes picked the wrong row for an incident's final state — `'29/2/2016'` sorts after `'2/3/2016'` alphabetically. `incidents_final_v2` parses the date before ordering. The two rules disagree on the selected row for **8,018 of 20,769 incidents (38.6%)**, and the effect on the headline numbers is large:
+**DQ-08 is resolved.** The original final-row rule (`incidents_final`, "v1") ordered `sys_updated_at` as text, so it sometimes picked the wrong row for an incident's final state — `'29/2/2016'` sorts after `'2/3/2016'` alphabetically. `incidents_final_v2` parses the date before ordering. The two rules disagree on the selected row for **8,018 of 20,769 incidents (38.6%)**, and the effect on the headline numbers is large:
 
-| Metric | v1 (published, buggy) | v2 (corrected, current) |
+| Metric | v1 (superseded) | v2 (corrected, current) |
 |---|---|---|
 | Overall SLA breach | 16.9% (3,517) | **39.4%** (8,174) |
 | Backlog (still open) | 38.6% (8,019) | **0.0%** (1 record, state "New": INC0029233, which has resolved and closed timestamps; most likely not a real open ticket) |
@@ -133,12 +133,12 @@ Recurrence was barely affected because it depends on `opened_at` and `caller_id`
 - Recurrence measures repeat *reporting* by the same caller in the same category. It does not measure repeat failure of the same asset, because the asset field is unusable.
 - `Caller 1904` and `Caller 290` may be automated or shared accounts. They are flagged, not removed, and need validation. Excluding them from the recurrence count (V3 robustness check) still shows the same pattern: 7,291 / 9,647 / 13,322 pairs remain at 7/14/30 days. They do account for most raw pairs: about 87% of the 73,359 pairs at 14 days come from these two callers.
 - Category 46's reassignment rate (0.92) is close to the dataset-wide average (0.99) and ranks 18th of 26 categories — it is not a differentiator, despite looking elevated against the original, buggy 0.83/25.9% baseline. The breach rate (54.1% vs 39.4% overall) is the evidence that actually holds up; the KPI and pattern description above reflect this (`sql/05` C7a/C7b).
-- The 7-day and 30-day sensitivity results are produced by running `sql/06` and the Python script. The results log at the top of `sql/06` records the 7, 14 and 30-day results.
+- Sensitivity results for the 7, 14 and 30-day windows are recorded in the results log at the top of `sql/06`.
 - This is a public dataset: there are no real stakeholders, so the owners and interventions are proposals to validate, not decisions.
 
-## Data licence and citation
+## Data source and citation
 
-The `.pbix` embeds the full incident dataset. Source: *Incident management process enriched event log*, UCI Machine Learning Repository, https://archive.ics.uci.edu/dataset/498/incident+management+process+enriched+event+log. Check the licence and citation terms on that page before publishing the `.pbix` or redistributing any data.
+The incident data is the *Incident management process enriched event log*, UCI Machine Learning Repository (dataset 498), donated 2019: https://archive.ics.uci.edu/dataset/498/incident+management+process+enriched+event+log. It is used here under the terms stated on that page. The `.pbix` embeds a copy of the data so the dashboard opens without a database.
 
 ## Deliverables at a glance
 
