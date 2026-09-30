@@ -10,13 +10,29 @@
 | **Output** | 3-page dashboard, executive brief, end-to-end case study, analytical appendix, AS-IS / TO-BE process |
 | **Author** | Priyanka Karyampudi |
 
-> The dashboard itself (`.pbix`) is not previewed here as images — see [`dashboard/README.md`](dashboard/README.md) for a full page-by-page description of what it shows and how it was built.
+## Dashboard
+
+| Operations overview | Recurrence intelligence | Action board |
+|---|---|---|
+| ![Operations overview](dashboard/dashboard1.png) | ![Recurrence intelligence](dashboard/dashboard2.png) | ![Action board](dashboard/dashboard3.png) |
+
+Page-by-page description, measures and design notes: [`dashboard/README.md`](dashboard/README.md).
+
+## Where this project comes from
+
+During my internship at Protiviti, while working on a client engagement, I noticed that incident management wasn't handled through any formal system. When something went wrong, it was communicated verbally: someone would flag it to the person responsible, and it would get resolved, informally, without being logged anywhere. It worked, in the sense that things got fixed.
+
+But it made me pause and ask: what if a bigger incident came up, one that needed real investigation rather than a quick fix? And what if the same kind of issue kept happening, quietly, in the background, with no one able to see that pattern because nothing was ever recorded? There was no way to know.
+
+That question stayed with me, and it is what this project is built around: **what becomes visible once incidents are actually captured, and what can you do with that visibility?**
+
+The analysis runs on a separate, real, anonymised, publicly available ServiceNow incident dataset. It is not the client's data and no internship or client information is used, so the question could be answered end to end without touching anything confidential.
 
 ## The problem
 
 Most IT teams fix an incident and close it. Nobody asks whether the same problem has happened before, whether it belongs to a team, or whether a fix worked. Without a record of incidents there is no way to tell a new issue from one that keeps coming back. This project shows what becomes possible once incidents are recorded and analysed: the organisation can move from reactive resolution to continuous problem identification and improvement.
 
-**Where this comes from.** This project started with a question I couldn't answer during an internship at Protiviti: if incidents are only handled verbally, with nothing recorded, how would you ever know if the same one kept coming back? This project is my attempt to answer that, using a separate, real, anonymised, publicly available ServiceNow dataset, not client data. Full story: `02_End_to_End_Case_Study.pdf`, section 2, or `documentation/Analysis_Walkthrough.md`.
+Full story: `02_End_to_End_Case_Study.pdf`, section 2, or `documentation/Analysis_Walkthrough.md`.
 
 > **New here?** Start with [`documentation/Analysis_Walkthrough.md`](documentation/Analysis_Walkthrough.md): it walks through the project in the order it happened, one SQL or Python script at a time.
 
@@ -57,7 +73,7 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 
 ## Repository structure
 
-````
+```
 .
 ├── README.md
 ├── 01_Executive_Brief.pdf              3 pages: cover + decision-ready summary
@@ -66,6 +82,9 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 ├── .gitignore
 ├── dashboard/
 │   ├── IT Operations Intelligence & Incident Problem Management Analytics.pbix
+│   ├── dashboard1.png                  Operations overview
+│   ├── dashboard2.png                  Recurrence intelligence
+│   ├── dashboard3.png                  Action board
 │   └── README.md                       Page guide, measures, design system, limitations
 ├── sql/
 │   ├── 01_data_profiling.sql           Load and profile the raw event log
@@ -88,7 +107,7 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 └── data/
     ├── README.md                       Source, download and load instructions
     └── sample_rows.csv                Fabricated illustrative rows (real schema, not real data)
-````
+```
 
 ## Process
 
@@ -103,11 +122,11 @@ Findings are written as fact, pattern and **hypothesis**. The data shows associa
 3. Reconcile: `SELECT COUNT(*) FROM incidents_final_v2;` must equal the distinct incident count, 20,769.
 4. Validate recurrence independently:
 
-````bash
+```bash
 pip install -r python/requirements.txt
 python python/recurrence_validation.py --input data/incident_event_log.csv \
        --windows 7 14 30 --expect-14d-pairs 73359 --final-row-mode parsed
-````
+```
 
    `--final-row-mode parsed` mirrors SQL v2 (the published figures, `incidents_final_v2`); it reconciles to 73,359 pairs at 14 days, with 5,238 incidents flagged (25.2%). `text` mode mirrors the original v1 rule and reconciles to 73,339 / 5,228 (25.2%) — kept only for comparison, not for quoting.
 
